@@ -6,11 +6,26 @@ require 'org/clock'
 
 module Org
   class File # :nodoc:
-    attr_accessor :filename
+    attr_accessor :filename, :redmine_trackers
 
     def initialize(filename)
       @filename = filename
       @file = ::File.read(filename)
+
+      load_redmine_tracker_associations
+    end
+
+    def load_redmine_tracker_associations
+      beginning = @file.index(/^#\+ORG_REDMINE_TRACKERS:/)
+      return unless beginning
+      ending = @file.index("\n", beginning)
+      value = @file[beginning + '#+ORG_REDMINE_TRACKERS:'.length ... ending].strip
+      @redmine_trackers = {}
+      value.split(" ").each do |pair|
+        tag, id = pair.split(':')
+        @redmine_trackers[nil] = id.to_i if tag[0] == '!'
+        @redmine_trackers[tag.gsub(/^!/, '')] = id.to_i
+      end
     end
 
     def [](*args)
