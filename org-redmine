@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler'
+require 'highline/import'
+require 'commander'
+
+Bundler.require
+
+$LOAD_PATH << './lib'
+require 'org'
+require 'core_ext'
+require 'org-redmine'
+
+load '/home/arthur/.org-redmine'
+
+def ensure_date_array(obj)
+  case obj
+  when String
+    date_start, date_end = obj.split('--')
+    dates = [Date.parse(date_start)]
+    while date_end && dates.last < Date.parse(date_end)
+      dates.push(dates.last + 1)
+    end
+    dates
+  when Date then obj
+  else [Date.today]
+  end
+end
+
+Commander.configure do
+  program :name, 'org-redmine'
+  program :version, '1.0.0'
+  program :description, <<DESC
+Extract issue and time tracking information from your org-mode files and
+synchronize them to Redmine.
+DESC
+
+  command :sync do |c|
+    c.syntax = 'org-redmine sync'
+    c.description = 'Synchronizes issues and time tracking information.'
+    c.option '--date DATE', String, 'A date (e.g. \'YYYY-MM-DD\') or a range (e.g. \'YYYY-MM-DD--YYYY-MM-DD\').'
+    c.option '--file FILENAME', String, 'Which file to scan.'
+    c.option '--redmine-host HOST', String, 'The Redmine Host.'
+    c.option '--redmine-key APIKEY', String, 'The Redmine API key.'
+    c.option '--verbose', 'Verbose output'
+    c.action do |_, options|
+      ActiveResource::Base.logger = Logger.new(STDERR) if options.verbose
+      dates = ensure_date_array(options.date)
+      org_redmine = OrgRedmine.new(
+        filename: options.filename || OrgRedmine.config.filename,
+        redmine_host: options.redmine_host || OrgRedmine.config.redmine_host,
+        redmine_key: options.redmine_key || OrgRedmine.config.redmine_key,
+        redmine_user: options.redmine_user || OrgRedmine.config.redmine_user
+      )
+      org_redmine.create_new_issues
+      dates.each do |date|
+        org_redmine.sync_time(date)
+      end
+    end
+  end
+end
