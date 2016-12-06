@@ -12,3 +12,5 @@ gem 'awesome_print'
 gem 'formatador'
 gem 'highline'
 gem 'commander'
+
+gem 'guard-rspec', require: false
