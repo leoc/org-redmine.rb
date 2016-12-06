@@ -2,6 +2,7 @@ require 'ostruct'
 
 class OrgRedmine
   attr_reader :filename, :file, :redmine_host, :redmine_key, :redmine_user
+  attr_reader :trackers
 
   def initialize(options = {})
     @filename = options[:filename]
@@ -33,14 +34,10 @@ class OrgRedmine
         end
         hash
       end
-    @tracker_ids =
-      begin
-        hash = {}
-        RedmineApi::Tracker.find(:all, params: { limit: 100 }).each do |tracker|
-          hash[tracker.name] = tracker.id
-        end
-        hash
-      end
+
+    trackers = RedmineApi::Tracker.find(:all, params: { limit: 100 })
+    @trackers = trackers.map { |t| [t.id.to_i, t] }.to_h
+    @tracker_ids = trackers.map { |t| [t.name, t.id.to_i] }.to_h
   end
 
   def extract_activity(tags)
