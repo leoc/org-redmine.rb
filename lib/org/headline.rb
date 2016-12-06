@@ -83,6 +83,11 @@ module Org
       properties[:redmine_project_id]
     end
 
+    def redmine_tracker
+      tracker_tag = tags.find { |tag| tag[0] == '@' }
+      file.redmine_trackers[tracker_tag]
+    end
+
     def contents_beginning
       ending
     end
