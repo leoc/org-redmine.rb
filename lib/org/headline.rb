@@ -16,6 +16,7 @@ module Org
       if (filters = options[:with])
         re.gsub!("(?<todo>#{TODO_KEYWORDS.join('|')})?", filters[:todo].source) if filters[:todo]
         re.gsub!('(?<title>.*?)', filters[:title].source) if filters[:title]
+        re.gsub!('(\s*:(?<tags>.+):)?', "\s*:#{Array(filters[:tags]).join(':')}:") if filters[:tags]
       end
       /#{re}/
     end
