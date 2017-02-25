@@ -102,6 +102,16 @@ module Org
       Org::Headline.new(self, beginning, ending)
     end
 
+    def projects
+      headlines = []
+      headline = find_headline
+      while headline
+        headlines.push(headline) if headline.redmine_project?
+        headline = find_headline(offset: headline.ending)
+      end
+      headlines
+    end
+
     def find_headline_properties(options = {})
       options = options.pick(:offset, :limit)
       beginning = scan(':PROPERTIES:', options)
