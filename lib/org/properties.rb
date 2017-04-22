@@ -25,6 +25,14 @@ module Org
       to_hash[name]
     end
 
+    def []=(name, value)
+      new_hash = to_hash
+      new_hash[name] = value
+      self.string = OPENING + "\n" + new_hash.map do |name, value|
+        ":#{name}: #{value}\n"
+      end.join("\n") + CLOSING
+    end
+
     def to_hash
       @hash ||=
         begin
