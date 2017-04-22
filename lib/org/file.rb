@@ -114,11 +114,11 @@ module Org
 
     def find_headline_properties(options = {})
       options = options.pick(:offset, :limit)
-      beginning = scan(':PROPERTIES:', options)
+      beginning = scan(Org::Properties::OPENING, options)
       return Org::Properties.new(self, options[:offset], options[:offset]) unless beginning
-      ending = scan(':END:', options.merge(offset: beginning))
+      ending = scan(Org::Properties::CLOSING, options.merge(offset: beginning))
       return Org::Properties.new(self, options[:offset], options[:offset]) unless ending
-      Org::Properties.new(self, beginning, ending + ':END:'.length)
+      Org::Properties.new(self, beginning, ending + Org::Properties::CLOSING.length)
     end
 
     def find_property(options = {})
