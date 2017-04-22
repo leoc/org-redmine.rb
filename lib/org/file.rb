@@ -167,6 +167,7 @@ module Org
       offset = options[:offset] || 0
       pos = file.index(obj, offset || 0)
       return if pos && options[:limit] && pos > options[:limit]
+      return file.length if pos && pos >= file.length
       pos
     end
 
@@ -174,6 +175,7 @@ module Org
       offset = options[:offset] || file.length
       pos = file.rindex(obj, offset || file.length)
       return if pos && options[:limit] && pos < options[:limit]
+      return 0 if pos && pos <= 0
       pos
     end
   end
