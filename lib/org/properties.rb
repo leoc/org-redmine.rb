@@ -2,8 +2,8 @@ require 'org/object'
 
 module Org
   class Properties < Org::Object # :nodoc:
-    OPENING = ':PROPERTIES:'.freeze
-    CLOSING = ':END:'.freeze
+    OPENING = "\n:PROPERTIES:".freeze
+    CLOSING = ":END:".freeze
 
     def headline
       file.find_headline(offset: beginning, reverse: true)
