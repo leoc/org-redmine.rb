@@ -1,5 +1,5 @@
 PATH
-  remote: ./vendor/redmine_api
+  remote: vendor/redmine_api
   specs:
     redmine_api (0.1.1)
       activeresource (= 4.0.0)
@@ -45,7 +45,7 @@ GEM
       rspec (>= 2.99.0, < 4.0)
     highline (1.7.8)
     i18n (0.7.0)
-    json (1.8.3)
+    json (1.8.6)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -101,7 +101,7 @@ DEPENDENCIES
   redmine_api!
 
 RUBY VERSION
-   ruby 2.3.0p0
+   ruby 2.4.0p0
 
 BUNDLED WITH
-   1.13.6
+   1.14.6
