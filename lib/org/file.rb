@@ -99,7 +99,7 @@ module Org
       beginning = scan(regexp, options)
       return unless beginning
       ending = scan("\n", offset: beginning)
-      Org::Headline.new(self, beginning, ending)
+      Org::Headline.new(self, beginning, ending || file.length)
     end
 
     def projects
