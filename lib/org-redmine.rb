@@ -206,6 +206,24 @@ class OrgRedmine
       end
     end.flatten
   end
+
+  def create_new_versions
+    new_local_versions = get_local_versions.select { |v| v[:id].blank? }
+    new_local_versions.each do |version|
+      created_version =
+        RedmineApi::Version
+          .project_id(@project_ids.key(version[:project_id]))
+          .create(name: version[:name])
+      fail created_version.errors unless created_version.errors.empty?
+
+      version_headline = file.find_headlines_with(title: /#{version[:name]}/) do |headline|
+        headline.ancestor_if { |h| @project_ids[h.redmine_project_id] == version[:project_id] }
+      end.first
+      version_headline.properties[:redmine_version_id] = created_version.id
+      file.save
+    end
+  end
+
   class << self
     def config
       @config ||= OpenStruct.new(
