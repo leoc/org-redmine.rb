@@ -35,6 +35,7 @@ describe OrgRedmine::Issue do
       [
         { id: 123, subject: 'New Subject', assigned_to_id: 5, start_date: '2016-12-01' },
         { id: 124, subject: 'Old Subject', assigned_to_id: 1 },
+        { id: 125, subject: 'Other Subject', assigned_to_id: 2 },
         { subject: 'Completely new issue', assigned_to_id: 3 }
       ]
     end
@@ -44,6 +45,7 @@ describe OrgRedmine::Issue do
     it 'has correct diff' do
       expect(diff).to include(id: 123, subject: 'New Subject', start_date: '2016-12-01')
       expect(diff).to include(id: 124, assigned_to_id: 1)
+      expect(diff).to include(id: 125, subject: 'Other Subject', assigned_to_id: 2)
     end
 
     it 'has new issues' do

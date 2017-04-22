@@ -20,8 +20,9 @@ class OrgRedmine
       # applied.
       def diff_issues(a, b)
         diffs = b.select { |i| !i[:id] }
-        a.each do |a_issue|
-          b_issue = b.find { |issue| issue[:id] == a_issue[:id] }
+        b.each do |b_issue|
+          a_issue = a.find { |issue| issue[:id] == b_issue[:id] }
+          a_issue ||= { id: b_issue[:id] }
           diff = diff_issue(a_issue, b_issue)
           diffs.push(diff) unless diff.keys - [:id] == []
         end
@@ -34,13 +35,13 @@ class OrgRedmine
           next unless l_issue[:id]
           m_issue = {}
           r_issue = remote.find { |issue| issue[:id] == l_issue[:id] }
-          (l_issue.keys - r_issue.keys).each do |key|
+          (l_issue.keys - Array(r_issue&.keys)).each do |key|
             m_issue[key] = l_issue[key]
           end
-          (r_issue.keys - l_issue.keys).each do |key|
+          (Array(r_issue&.keys) - l_issue.keys).each do |key|
             m_issue[key] = r_issue[key]
           end
-          (r_issue.keys & l_issue.keys).each do |key|
+          (Array(r_issue&.keys) & l_issue.keys).each do |key|
             if r_issue[key] == l_issue[key]
               m_issue[key] = l_issue[key]
             else
@@ -49,6 +50,10 @@ class OrgRedmine
           end
           m_issue[:id] = l_issue[:id]
           merge.push(m_issue)
+        end
+        remote.each do |r_issue|
+          next if merge.find { |m_issue| m_issue[:id] == r_issue[:id] }
+          merge.push(r_issue)
         end
         merge
       end
