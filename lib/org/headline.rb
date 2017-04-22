@@ -112,7 +112,6 @@ module Org
     end
 
     def properties
-      return {} if contents_ending.nil?
       file.find_headline_properties(
         offset: contents_beginning,
         limit: contents_ending
