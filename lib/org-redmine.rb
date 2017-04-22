@@ -175,6 +175,37 @@ class OrgRedmine
     transfer_time_entries(clocks)
   end
 
+
+  def get_local_versions
+    versions = []
+    headline = file.find_headline(with: { tags: %i(milestone) })
+    while headline
+      version = {}
+      version[:id] = headline.properties[:redmine_version_id].andand.to_i
+      version[:name] = headline.sanitized_title
+      project = headline.ancestor_if(&:redmine_project?)
+      version[:project_id] = @project_ids[project.redmine_project_id] if project&.redmine_project_id
+      versions.push(version)
+      headline = file.find_headline(offset: headline.ending, with: { tags: %i(milestone) })
+    end
+    versions
+  end
+
+  def get_remote_versions
+    file.projects.map do |project|
+      RedmineApi::Version
+        .project_id(project.redmine_project_id)
+        .find_all(params: { limit: 100 })
+        .map do |version|
+        {
+          id: version.id,
+          project_id: version.project.id.to_i,
+          name: version.name,
+          status: version.status,
+        }
+      end
+    end.flatten
+  end
   class << self
     def config
       @config ||= OpenStruct.new(
