@@ -233,6 +233,65 @@ class OrgRedmine
     cache.save
   end
 
+  def sync_versions
+    local_versions = get_local_versions.select { |v| v[:id].present? }
+    local_versions_diff = OrgRedmine::Issue.diff_issues(cache.versions, get_local_versions)
+    remote_versions_diff = OrgRedmine::Issue.diff_issues(cache.versions, get_remote_versions)
+
+    merged_versions_diff = OrgRedmine::Issue.merge_diff(local_versions_diff, remote_versions_diff).map do |version|
+      version.map do |key, value|
+        if value.is_a?(Array)
+          puts "Resolve conflict:"
+          Formatador.display_table([{ field: key,
+                                      local_value: value[0],
+                                      remote_value: value[1]
+                                    }],
+                                   %i(field local_value remote_value))
+          keep = nil
+          choose do |menu|
+            menu.choice('Keep Local') { keep = 0 }
+            menu.choice('Keep Remote') { keep = 1 }
+          end
+          [key, value[keep]]
+        else
+          [key, value]
+        end
+      end.to_h
+    end
+
+    # 1. apply merged_diff to local
+    merged_versions_diff.each do |version|
+      version_headline = file.find_version(version[:id])
+      if version_headline
+        version_headline.title = version[:name]
+      else
+        project_headline = file.find_project_headline(@project_ids.key(version[:project_id]))
+        project_headline.add_subheadline(
+          title: version[:name],
+          todo: 'TODO',
+          tags: %i(milestone)
+        ) do |headline|
+          headline.properties[:redmine_version_id] = version[:id]
+        end
+      end
+    end
+    file.save
+
+    # 2. apply merged_diff to remote
+    merged_versions_diff.each do |version|
+      redmine_version =
+        RedmineApi::Version
+          .project_id(@project_ids.key(version[:project_id]))
+          .find(version[:id])
+      redmine_version.name = version[:name]
+      redmine_version.save!
+    end
+
+    # 3. apply merged_diff to cache and save cache
+    cache.apply_versions_diff(merged_versions_diff)
+    cache.save
+  end
+
   class << self
     def config
       @config ||= OpenStruct.new(
