@@ -137,6 +137,16 @@ module Org
       find_headline(options)
     end
 
+    def find_project_headline(id, options = {})
+      project_id_pos = scan(":redmine_project_id: #{id}", options)
+      return if project_id_pos.nil?
+      options = options.merge(
+        offset: project_id_pos,
+        reverse: true
+      )
+      find_headline(options)
+    end
+
     def find_property(options = {})
       return if options[:offset] == options[:limit]
       options = options.pick(:offset, :limit)
