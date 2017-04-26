@@ -51,6 +51,19 @@ module Org
       self.string = new_string
     end
 
+    def todo
+      match[:todo]
+    end
+
+    def todo=(new_todo)
+      self.string =
+        if todo
+          string.gsub(/^(?<stars>\*+) (?<todo>#{TODO_KEYWORDS.join('|')})/, new_todo)
+        else
+          string.replace(level + 1, level + 1, new_todo)
+        end
+    end
+
     def direct_tags
       match[:tags]
     end
