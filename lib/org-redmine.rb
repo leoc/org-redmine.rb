@@ -159,6 +159,7 @@ class OrgRedmine
           activity_id: @activity_ids[clock[:activity]],
           spent_on: clock[:spent_on]
         )
+        binding.pry unless time_entry.errors.empty?
       end
     end
   end
