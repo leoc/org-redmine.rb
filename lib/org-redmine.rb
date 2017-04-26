@@ -2,7 +2,7 @@ require 'ostruct'
 
 class OrgRedmine
   attr_reader :filename, :file, :redmine_host, :redmine_key, :redmine_user
-  attr_reader :trackers
+  attr_reader :trackers, :cache
 
   def initialize(options = {})
     @filename = options[:filename]
@@ -16,6 +16,8 @@ class OrgRedmine
       c.site = @redmine_host
       c.token @redmine_key
     end
+
+    @cache = OrgRedmine::Cache.new("/home/arthur/.org_redmine.cache.json")
 
     @user = RedmineApi::User.find(:first, params: { login: @redmine_user })
     @project_ids =
