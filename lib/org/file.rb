@@ -127,6 +127,16 @@ module Org
       Org::Properties.new(self, beginning, ending + Org::Properties::CLOSING.length)
     end
 
+    def find_version(id, options = {})
+      version_id_pos = scan(":redmine_version_id: #{id}", options)
+      return if version_id_pos.nil?
+      options = options.merge(
+        offset: version_id_pos,
+        reverse: true
+      )
+      find_headline(options)
+    end
+
     def find_property(options = {})
       return if options[:offset] == options[:limit]
       options = options.pick(:offset, :limit)
