@@ -224,7 +224,13 @@ class OrgRedmine
       end.first
       version_headline.properties[:redmine_version_id] = created_version.id
       file.save
+      cache.add_version(
+        id: created_version.id,
+        name: created_version.name,
+        project_id: created_version.project.id
+      )
     end
+    cache.save
   end
 
   class << self
