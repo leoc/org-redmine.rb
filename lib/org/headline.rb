@@ -5,6 +5,19 @@ module Org
     TODO_KEYWORDS = %w(TODO NEXT DONE WAITING HOLD SOMEDAY CANCELLED READ FINISHED REJECTED).freeze
     REGEXP = /^(?<stars>\*+) (?<todo>#{TODO_KEYWORDS.join('|')})? ?(?<title>.*?)\s*(\s*:(?<tags>.+):)?$/
 
+    def initialize(file, beginning, ending, options = {})
+      super(file, beginning, ending)
+      if beginning == ending
+        options = { level: 1 }.merge(options)
+        todo = options[:todo] ? "#{options[:todo]} " : ''
+        tags = options[:tags] ? "  :#{options[:tags].join(':')}:" : ''
+        file.insert(beginning, "\n")
+        @beginning = beginning + 1
+        @ending = beginning + 1
+        self.string = "#{'*' * options[:level]} #{todo}#{options[:title]}#{tags}"
+      end
+    end
+
     def ==(other)
       return false unless other.is_a?(Org::Headline)
       other.beginning == beginning && other.ending == ending
@@ -146,6 +159,15 @@ module Org
 
     def ancestor_if(&block)
       file.find_ancestor_if(offset: beginning, level: (level - 1), &block)
+    end
+
+    def add_subheadline(options = {}, &block)
+      yield Headline.new(
+        file,
+        level_ending,
+        level_ending,
+        options.merge(level: (level + 1))
+      )
     end
   end
 end
