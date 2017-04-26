@@ -38,7 +38,7 @@ module Org
 
     def replace(beginning, ending, str)
       pre = file[0...beginning]
-      post = file[ending...-1]
+      post = file[ending...file.length]
       @file = pre + str + post
     end
 
