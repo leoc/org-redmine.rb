@@ -36,6 +36,12 @@ module Org
       file.length
     end
 
+    def insert(pos, str)
+      pre = file[0...pos]
+      post = file[pos...file.length]
+      @file = pre + str + post
+    end
+
     def replace(beginning, ending, str)
       pre = file[0...beginning]
       post = file[ending...file.length]
