@@ -265,7 +265,7 @@ class OrgRedmine
     merged_versions_diff.each do |version|
       version_headline = file.find_version(version[:id])
       if version_headline
-        version_headline.title = version[:name]
+        version_headline.title = version[:name] if version[:name]
       else
         project_headline = file.find_project_headline(@project_ids.key(version[:project_id]))
         project_headline.add_subheadline(
@@ -285,7 +285,7 @@ class OrgRedmine
         RedmineApi::Version
           .project_id(@project_ids.key(version[:project_id]))
           .find(version[:id])
-      redmine_version.name = version[:name]
+      redmine_version.name = version[:name] if version[:name]
       redmine_version.save!
     end
 
