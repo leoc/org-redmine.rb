@@ -51,7 +51,7 @@ module Org
     def sanitized_title
       title
         .gsub(/\[\d+-\d+-\d+ ?\w{3}? ?(\d+:\d+)?\]/, '')
-        .gsub(/^#(\d)? - /, '')
+        .gsub(/^#(\d+)? - /, '')
         .strip
     end
 
