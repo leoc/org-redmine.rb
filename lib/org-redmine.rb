@@ -67,6 +67,7 @@ class OrgRedmine
     headline = file.find_headline(with: { title: /# - .*/ })
     while headline do
       project = headline.ancestor_if(&:redmine_project?)
+      version = headline.ancestor_if(&:redmine_version?)
       parent = headline.ancestor_if(&:redmine_issue?)
 
       if project.nil?
@@ -78,18 +79,20 @@ class OrgRedmine
       issue = {
         project: project.redmine_project_id,
         tracker: extract_tracker(headline.tags),
+        version: version.sanitized_title,
         subject: headline.sanitized_title,
         parent_issue: parent&.redmine_issue_id,
         assigned_to: "#{@user.firstname} #{@user.lastname}"
       }
 
-      Formatador.display_table([issue], %i(project tracker subject parent_issue assigned_to))
+      Formatador.display_table([issue], %i(project tracker version subject parent_issue assigned_to))
 
       exit unless agree('Should this issue be synced to Redmine? [y/n]', true)
 
       issue = RedmineApi::Issue.create(
         project_id: @project_ids[project.redmine_project_id],
         tracker_id: @tracker_ids[extract_tracker(headline.tags)],
+        fixed_version_id: version.andand.redmine_version_id,
         subject: headline.sanitized_title,
         parent_issue_id: parent&.redmine_issue_id,
         assigned_to_id: @user.id
