@@ -237,7 +237,7 @@ class OrgRedmine
 
   def sync_versions
     local_versions = get_local_versions.select { |v| v[:id].present? }
-    local_versions_diff = OrgRedmine::Issue.diff_issues(cache.versions, get_local_versions)
+    local_versions_diff = OrgRedmine::Issue.diff_issues(cache.versions, local_versions)
     remote_versions_diff = OrgRedmine::Issue.diff_issues(cache.versions, get_remote_versions)
 
     merged_versions_diff = OrgRedmine::Issue.merge_diff(local_versions_diff, remote_versions_diff).map do |version|
