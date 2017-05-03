@@ -186,6 +186,7 @@ class OrgRedmine
       version = {}
       version[:id] = headline.properties[:redmine_version_id].andand.to_i
       version[:name] = headline.sanitized_title
+      version[:status] = 'open'
       project = headline.ancestor_if(&:redmine_project?)
       version[:project_id] = @project_ids[project.redmine_project_id] if project&.redmine_project_id
       versions.push(version)
@@ -227,7 +228,8 @@ class OrgRedmine
       cache.add_version(
         id: created_version.id,
         name: created_version.name,
-        project_id: created_version.project.id
+        project_id: created_version.project.id,
+        status: created_version.status
       )
     end
     cache.save
