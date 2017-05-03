@@ -110,6 +110,14 @@ module Org
       properties[:redmine_project_id]
     end
 
+    def redmine_version?
+      !properties[:redmine_version_id].nil?
+    end
+
+    def redmine_version_id
+      properties[:redmine_version_id].try(:to_i)
+    end
+
     def redmine_tracker
       tracker_tag = tags.find { |tag| tag[0] == '@' }
       file.redmine_trackers[tracker_tag]
