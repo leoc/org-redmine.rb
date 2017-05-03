@@ -6,9 +6,9 @@ class OrgRedmine
       @file = file
       @cache =
         if File.exist?(file)
-          JSON.load(File.new(file)).with_indifferent_access
+          JSON.load(File.new(file)).deep_symbolize_keys
         else
-          {}.with_indifferent_access
+          {}.deep_symbolize_keys
         end
     end
 
@@ -17,7 +17,7 @@ class OrgRedmine
     end
 
     def versions
-      cache['versions'] ||= []
+      cache[:versions] ||= []
     end
 
     def apply_versions_diff(versions_diff)
@@ -25,11 +25,11 @@ class OrgRedmine
     end
 
     def add_version(version)
-      versions.push(version)
+      versions.push(version.symbolize_keys)
     end
 
     def issues
-      cache['issues'] ||= []
+      cache[:issues] ||= []
     end
 
     def apply_issues_diff(issues_diff)
@@ -37,7 +37,7 @@ class OrgRedmine
     end
 
     def add_issue(issue)
-      issues.push(issue)
+      issues.push(issue.symbolize_keys)
     end
 
     def save
@@ -49,6 +49,7 @@ class OrgRedmine
     private
 
     def apply_diff(list, diff)
+      diff = diff.map(&:symbolize_keys)
       diff.each do |diff_obj|
         existing_element = list.find do |issue|
           issue[:id] == diff_obj[:id] &&
