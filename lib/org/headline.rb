@@ -170,12 +170,13 @@ module Org
     end
 
     def add_subheadline(options = {}, &block)
-      yield Headline.new(
+      headline = Headline.new(
         file,
         level_ending,
         level_ending,
         options.merge(level: (level + 1))
       )
+      yield(headline) if block_given?
     end
   end
 end
