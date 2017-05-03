@@ -139,7 +139,7 @@ module Org
     def level_ending
       next_same_level = file.find_headline(offset: ending, level: level)
       if next_same_level
-        next_same_level.ending
+        next_same_level.beginning - 1
       else
         file.length
       end
