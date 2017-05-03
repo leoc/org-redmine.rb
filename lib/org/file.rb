@@ -127,7 +127,7 @@ module Org
       Org::Properties.new(self, beginning, ending + Org::Properties::CLOSING.length)
     end
 
-    def find_version(id, options = {})
+    def find_version_headline(id, options = {})
       version_id_pos = scan(":redmine_version_id: #{id}", options)
       return if version_id_pos.nil?
       options = options.merge(
@@ -136,6 +136,7 @@ module Org
       )
       find_headline(options)
     end
+    alias_method :find_version, :find_version_headline
 
     def find_project_headline(id, options = {})
       project_id_pos = scan(":redmine_project_id: #{id}", options)
