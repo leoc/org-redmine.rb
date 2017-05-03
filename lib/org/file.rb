@@ -16,11 +16,11 @@ module Org
     end
 
     def load_redmine_tracker_associations
+      @redmine_trackers = {}
       beginning = @file.index(/^#\+ORG_REDMINE_TRACKERS:/)
       return unless beginning
       ending = @file.index("\n", beginning)
       value = @file[beginning + '#+ORG_REDMINE_TRACKERS:'.length ... ending].strip
-      @redmine_trackers = {}
       value.split(" ").each do |pair|
         tag, id = pair.split(':')
         @redmine_trackers[nil] = id.to_i if tag[0] == '!'
