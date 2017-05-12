@@ -30,7 +30,11 @@ describe Org::Headline do
   end
 
   describe '#title=' do
-    it 'updates the associated Org::File'
+    it 'updates existing title' do
+      headlines[3].title = 'Some new title for SubSub'
+      expect(headlines[3].string)
+        .to eq('*** DONE Some new title for SubSub                                            :@feature:')
+    end
   end
 
   describe '#tags' do
