@@ -151,7 +151,15 @@ describe Org::Headline do
   end
 
   describe '#todo=' do
-    it 'updates the associated Org::File'
+    it 'updates existing TODO' do
+      headlines[5].todo = 'DONE'
+      expect(headlines[5].string).to eq('** DONE Third Sub')
+    end
+
+    it 'adds new TODO' do
+      headlines[4].todo = 'TODO'
+      expect(headlines[4].string).to eq('* TODO Second Parent')
+    end
   end
 
   describe '#contents_beginning' do

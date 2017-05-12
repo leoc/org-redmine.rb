@@ -69,12 +69,13 @@ module Org
     end
 
     def todo=(new_todo)
-      self.string =
-        if todo
-          string.gsub(/^(?<stars>\*+) (?<todo>#{TODO_KEYWORDS.join('|')})/, new_todo)
-        else
-          string.replace(level + 1, level + 1, new_todo)
-        end
+      str = string
+      if todo
+        str[level + 1, todo.length] = new_todo
+      else
+        str[level + 1, 0] = "#{new_todo} "
+      end
+      self.string = str
     end
 
     def direct_tags
