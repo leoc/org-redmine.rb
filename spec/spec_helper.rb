@@ -4,6 +4,8 @@ require 'highline/import'
 require 'commander'
 require 'redmine_api'
 
+Bundler.require
+
 $LOAD_PATH << '../lib'
 
 require 'org'

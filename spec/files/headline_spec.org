@@ -1,0 +1,12 @@
+* First Parent                                                    :inherited:
+** TODO First Sub
+** NEXT Second Sub
+*** DONE First SubSub                                            :@feature:
+* Second Parent
+Some contents for this heading.
+
+** TODO Third Sub
+:PROPERTIES:
+:STYLE: habit
+:END:
+Some description.

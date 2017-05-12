@@ -10,7 +10,7 @@ module Org
 
     def initialize(filename)
       @filename = filename
-      @file = ::File.read(filename)
+      @file = ::File.read(::File.expand_path(filename))
 
       load_redmine_tracker_associations
     end
@@ -95,6 +95,22 @@ module Org
         headlines.push(headline) if block_match && tags_match
 
         headline = find_headline(offset: headline.contents_ending, with: filters)
+      end
+      headlines
+    end
+
+    def headlines(with: {})
+      headlines = []
+      headline = find_headline(with: with)
+      while headline
+        block_match = true
+        block_match = yield(headline) if block_given?
+        tags_match = true
+        tags_match = headline.tags?(with[:tags]) if with[:tags]
+
+        headlines.push(headline) if block_match && tags_match
+
+        headline = find_headline(offset: headline.ending, with: with)
       end
       headlines
     end

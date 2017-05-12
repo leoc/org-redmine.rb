@@ -57,7 +57,7 @@ class OrgRedmine
 
   def extract_tracker(tags)
     tag = tags.find { |tag| tag[0] == '@' }
-    return 'Task' if tag.nil?
+    return 'Bug' if tag.nil?
     @tracker_ids.keys.find do |key|
       key.downcase.include?(tag[1..-1])
     end

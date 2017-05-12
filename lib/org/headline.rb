@@ -81,6 +81,19 @@ module Org
       match[:tags]
     end
 
+    def immediate_tags
+      match[:tags]
+    end
+
+    def inherited_tags
+      tags = []
+      each_ancestor do |headline|
+        parent_tags = headline.direct_tags - OrgRedmine.config.tags_exclude_from_inheritance
+        tags.push(*parent_tags)
+      end
+      tags.uniq
+    end
+
     def tags
       tags = direct_tags
       each_ancestor do |headline|
@@ -130,7 +143,7 @@ module Org
     def contents_ending
       next_headline = file.find_headline(offset: ending)
       if next_headline
-        next_headline.ending
+        next_headline.beginning - 1
       else
         file.length
       end
@@ -146,12 +159,18 @@ module Org
     end
 
     def contents
-      file[contents_beginning...contents_ending]
+      file[contents_beginning + 1...contents_ending]
+        .gsub(/:PROPERTIES:.*:END:\n/m, '')
     end
 
-    def tag?(*tags)
-      tags = tags.flat_map { |tag| Array(tag) }
-      self.tags & tags == tags
+    def tag?(*match_tags)
+      options = match_tags.last.is_a?(Hash) ? match_tags.pop : nil
+      options ||= { immediate: true, inherited: true }
+      current_tags =
+        (options[:immediate] ? immediate_tags : []) +
+        (options[:inherited] ? inherited_tags : [])
+      match_tags = match_tags.flat_map { |tag| Array(tag) }
+      current_tags & match_tags == match_tags
     end
 
     def properties
