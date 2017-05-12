@@ -137,6 +137,14 @@ module Org
       file.redmine_trackers[tracker_tag]
     end
 
+    def tags=(new_tags)
+      str = string
+      match = str.match(REGEXP)
+      new_str = new_tags.map { |t| t.gsub(/[\-]/, ':') }.join(':')
+      str[match.begin(:tags)...match.end(:tags)] = new_str
+      self.string = str
+    end
+
     def contents_beginning
       ending
     end

@@ -53,7 +53,11 @@ describe Org::Headline do
   end
 
   describe '#tags=' do
-    it 'updates the associated Org::File'
+    it 'updates existing tags' do
+      headlines[3].tags = %w[@feature newtag]
+      expect(headlines[3].string)
+        .to eq('*** DONE First SubSub                                            :@feature:newtag:')
+    end
   end
 
   describe '#immediate_tags' do
