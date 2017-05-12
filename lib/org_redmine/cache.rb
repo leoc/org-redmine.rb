@@ -52,8 +52,7 @@ class OrgRedmine
       diff = diff.map(&:symbolize_keys)
       diff.each do |diff_obj|
         existing_element = list.find do |issue|
-          issue[:id] == diff_obj[:id] &&
-            issue[:project_id] == diff_obj[:project_id]
+          issue[:id] == diff_obj[:id]
         end
         if existing_element
           diff_obj.each_pair do |key, value|
