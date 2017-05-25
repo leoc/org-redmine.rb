@@ -197,9 +197,9 @@ describe Org::Headline do
       expect(headlines[0].level_ending).to eq(190)
       expect(headlines[1].level_ending).to eq(95)
       expect(headlines[2].level_ending).to eq(190)
-      expect(headlines[3].level_ending).to eq(225)
-      expect(headlines[4].level_ending).to eq(225)
-      expect(headlines[5].level_ending).to eq(225)
+      expect(headlines[3].level_ending).to eq(190)
+      expect(headlines[4].level_ending).to eq(309)
+      expect(headlines[5].level_ending).to eq(309)
     end
   end
 

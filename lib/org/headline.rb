@@ -25,7 +25,10 @@ module Org
 
     def self.finder_regexp(options = {})
       re = REGEXP.source
-      re.gsub!('(?<stars>\*+)', "(\\\*{#{options[:level]}})") if options[:level]
+      case options[:level]
+      when Integer then re.gsub!('(?<stars>\*+)', "(\\\*{#{options[:level]}})")
+      when Range then re.gsub!('(?<stars>\*+)', "(\\\*{#{options[:level].begin},#{options[:level].end}})")
+      end
       if (filters = options[:with])
         re.gsub!("(?<todo>#{TODO_KEYWORDS.join('|')})?", filters[:todo].source) if filters[:todo]
         re.gsub!('(?<title>.*?)', filters[:title].source) if filters[:title]
@@ -159,9 +162,10 @@ module Org
     end
 
     def level_ending
-      next_same_level = file.find_headline(offset: ending, level: level)
-      if next_same_level
-        next_same_level.beginning - 1
+      next_heading =
+        file.find_headline(offset: ending, level: (1..level))
+      if next_heading
+        next_heading.beginning - 1
       else
         file.length
       end
