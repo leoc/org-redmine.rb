@@ -59,4 +59,28 @@ DESC
       end
     end
   end
+
+  command :sync_test do |c|
+    c.syntax = 'org-redmine sync'
+    c.description = 'Synchronizes issues and time tracking information.'
+    c.option '--date DATE', String, 'A date (e.g. \'YYYY-MM-DD\') or a range (e.g. \'YYYY-MM-DD--YYYY-MM-DD\').'
+    c.option '--file FILENAME', String, 'Which file to scan.'
+    c.option '--redmine-host HOST', String, 'The Redmine Host.'
+    c.option '--redmine-key APIKEY', String, 'The Redmine API key.'
+    c.option '--verbose', 'Verbose output'
+    c.action do |_, options|
+      ActiveResource::Base.logger = Logger.new(STDERR) if options.verbose
+      org_redmine = OrgRedmine.new(
+        filename: options.file || OrgRedmine.config.filename,
+        redmine_host: options.redmine_host || OrgRedmine.config.redmine_host,
+        redmine_key: options.redmine_key || OrgRedmine.config.redmine_key,
+        redmine_user: options.redmine_user || OrgRedmine.config.redmine_user
+      )
+
+      org_redmine.create_new_versions
+      org_redmine.sync_versions
+      org_redmine.create_new_issues
+      org_redmine.sync_issues
+    end
+  end
 end
