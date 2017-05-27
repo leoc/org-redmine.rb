@@ -148,6 +148,23 @@ module Org
       self.string = str
     end
 
+    def level=(new_level)
+      set_level(new_level)
+    end
+
+    def set_level(new_level, with_child: true)
+      if with_child
+        diff = new_level - level
+        each_child(any: true) do |child|
+          child.set_level(child.level + diff, with_child: false)
+        end
+      end
+      str = string
+      match = str.match(REGEXP)
+      str[match.begin(:stars)...match.end(:stars)] = '*' * new_level
+      self.string = str
+    end
+
     def contents_beginning
       ending
     end

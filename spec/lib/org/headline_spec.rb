@@ -14,8 +14,84 @@ describe Org::Headline do
   end
 
   describe '#level=' do
-    it 'changes level'
-    it 'indents all subheadings'
+    let(:file) { Org::File.new('./spec/files/headline_level_spec.org') }
+    let(:headlines) { file.headlines }
+
+    it 'decreases level' do
+      headlines[6].level = 1
+      expect(file.send(:file)).to eq(<<FILE)
+* First Parent                                                    :inherited:
+** TODO First Sub
+** NEXT Second Sub
+*** DONE First SubSub                                            :@feature:
+**** TODO First SubSubSub
+* Second Parent
+Some contents for this heading.
+
+* TODO Third Sub
+:PROPERTIES:
+:STYLE: habit
+:END:
+Some description.
+FILE
+    end
+
+    it 'decreases the level of subheadings accordingly' do
+      headlines[2].level = 1
+      expect(file.send(:file)).to eq(<<FILE)
+* First Parent                                                    :inherited:
+** TODO First Sub
+* NEXT Second Sub
+** DONE First SubSub                                            :@feature:
+*** TODO First SubSubSub
+* Second Parent
+Some contents for this heading.
+
+** TODO Third Sub
+:PROPERTIES:
+:STYLE: habit
+:END:
+Some description.
+FILE
+    end
+
+    it 'increases level' do
+      headlines[5].level = 2
+      expect(file.send(:file)).to eq(<<FILE)
+* First Parent                                                    :inherited:
+** TODO First Sub
+** NEXT Second Sub
+*** DONE First SubSub                                            :@feature:
+**** TODO First SubSubSub
+** Second Parent
+Some contents for this heading.
+
+*** TODO Third Sub
+:PROPERTIES:
+:STYLE: habit
+:END:
+Some description.
+FILE
+    end
+
+    it 'increases the level of subheadings accordingly' do
+      headlines[2].level = 3
+      expect(file.send(:file)).to eq(<<FILE)
+* First Parent                                                    :inherited:
+** TODO First Sub
+*** NEXT Second Sub
+**** DONE First SubSub                                            :@feature:
+***** TODO First SubSubSub
+* Second Parent
+Some contents for this heading.
+
+** TODO Third Sub
+:PROPERTIES:
+:STYLE: habit
+:END:
+Some description.
+FILE
+    end
   end
 
   describe '#title' do
@@ -221,14 +297,17 @@ describe Org::Headline do
   end
 
   describe '#each_ancestor' do
-
+    it 'goes through all ancestors'
   end
 
-  describe '#ancestor_if' do
-
+  describe '#find_ancestor' do
+    it 'finds the filtered ancestor'
   end
 
   describe '#append_subheading' do
+    it 'appends a heading to the given heading'
+  end
+
   describe '#each_child' do
     let(:file) { Org::File.new('./spec/files/headline_level_spec.org') }
     let(:headlines) { file.headlines }
