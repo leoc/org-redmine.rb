@@ -1,5 +1,8 @@
 #+ORG_REDMINE_TRACKERS: @bug:1 @feature:2 @support:3 !@task:4 @feedback:5 @planning:6 @doc:7 @requirement:8
 * First Parent                                                    :inherited:
+:PROPERTIES:
+:redmine_project_id: some_project
+:END:
 ** TODO First Sub
 ** NEXT Second Sub
 *** DONE First SubSub                                            :@feature:

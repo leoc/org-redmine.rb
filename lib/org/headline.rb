@@ -198,8 +198,9 @@ module Org
     end
 
     def contents
-      file[contents_beginning + 1...contents_ending]
-        .gsub(/:PROPERTIES:.*:END:\n/m, '')
+      file[contents_beginning...contents_ending]
+        .gsub(properties.string, '')
+        .gsub(/\A\n/, '')
     end
 
     def tag?(*match_tags)
