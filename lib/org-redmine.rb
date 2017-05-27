@@ -42,8 +42,17 @@ class OrgRedmine
     @tracker_ids = trackers.map { |t| [t.name, t.id.to_i] }.to_h
   end
 
+  def tracker_tag(tracker)
+    "@#{tracker.downcase}"
+  end
+
+  def clean_issue(issue)
+    issue.select do |key, value|
+      %i(id version_id project_id tracker_id subject).include?(key)
+    end
+  end
+
   def extract_activity(tags)
-    ap tags
     tags = tags.select { |tag| tag[0] == '#' }
     tags = %w(#development) if tags.empty?
     keys = @activity_ids.keys
@@ -181,6 +190,130 @@ class OrgRedmine
     transfer_time_entries(clocks)
   end
 
+  def get_local_issues
+    issues = []
+    headline = file.find_headline(with: { title: /#(\d+) - .*/ })
+    while headline
+      issue = {}
+      issue[:id] = headline.redmine_issue_id if headline.redmine_issue_id
+      issue[:subject] = headline.sanitized_title
+      issue[:tracker_id] = @tracker_ids[extract_tracker(headline.tags)]
+
+      # TODO: add status_id with proper mapping
+      # TODO: add assigned_to_id with proper mapping
+
+      parent = headline.ancestor_if(&:redmine_issue?)
+      issue[:parent_issue] = parent.redmine_issue_id if parent&.redmine_issue_id
+      project = headline.ancestor_if(&:redmine_project?)
+      issue[:project_id] = @project_ids[project.redmine_project_id] if project&.redmine_project_id
+      version = headline.ancestor_if(&:redmine_version?)
+      issue[:version_id] = version.redmine_version_id.to_i if version&.redmine_version_id
+      issues.push(issue)
+      headline = file.find_headline(offset: headline.ending, with: { title: /#(\d+) - .*/ })
+    end
+    issues
+  end
+
+  def get_remote_issues(last_sync_at = nil)
+    issues = []
+    issues_query = RedmineApi::Issue.find(
+      :all,
+      params: {
+        status_id: 'open',
+        assigned_to_id: @user.id,
+        limit: 100,
+        sort: 'id'
+      }
+    )
+    issues.push(*issues_query)
+    while issues_query.next_page?
+      issues_query = issues_query.next_page
+      issues.push(*issues_query)
+    end
+    issues.map do |issue|
+      {
+        id: issue.id,
+        project_id: issue.project.id.to_i,
+        tracker_id: issue.tracker.id.to_i,
+        status_id: issue.status.id.to_i,
+        subject: issue.subject,
+        version_id: issue.try(:fixed_version).andand.id,
+        assigned_to_id: issue.try(:assigned_to).id.to_i,
+        start_date: issue.try(:start_date),
+        due_date: issue.try(:due_date),
+        parent_issue: issue.try(:parent)&.id&.to_i
+      }
+    end
+  end
+
+  def sync_issues
+    local_issues = get_local_issues.select { |issue| issue[:id].present? }
+    ap(local_issues: local_issues)
+    ap(remote_issues: get_remote_issues)
+    ap(
+      local_cache: cache.issues,
+      local_issues: local_issues
+    )
+
+    cache_issues = cache.issues.map(&method(:clean_issue))
+    local_issues_diff = OrgRedmine::Issue.diff_issues(cache_issues, local_issues.map(&method(:clean_issue)))
+    remote_issues_diff = OrgRedmine::Issue.diff_issues(cache_issues, get_remote_issues.map(&method(:clean_issue)))
+    binding.pry
+    ap(local_issues_diff: local_issues_diff)
+    ap(remote_issues_diff: remote_issues_diff)
+
+    merged_issues_diff = OrgRedmine::Issue.merge_diff(local_issues_diff, remote_issues_diff).map do |issue|
+      issue.map do |key, value|
+        if value.is_a?(Array)
+          puts "Resolve conflict:"
+          Formatador.display_table([{ field: key,
+                                      local_value: value[0],
+                                      remote_value: value[1]
+                                    }],
+                                   %i(field local_value remote_value))
+          keep = nil
+          choose do |menu|
+            menu.choice('Keep Local') { keep = 0 }
+            menu.choice('Keep Remote') { keep = 1 }
+          end
+          [key, value[keep]]
+        else
+          [key, value]
+        end
+      end.to_h
+    end
+
+    # 1. apply merged_diff to local
+    merged_issues_diff.each do |issue|
+      issue_headline = file.find_headline(with: { title: /##{issue[:id]} - .*/ })
+      if issue_headline
+        issue_headline.title = "##{issue[:id]} - #{issue[:subject]}" if issue[:subject]
+        issue_headline.redmine_tracker = @trackers[issue[:tracker_id]].name.downcase if issue[:tracker_id]
+      else
+        parent_headline = nil
+        parent_headline = file.find_version_headline(issue[:version_id]) if issue[:version_id]
+        parent_headline ||= file.find_project_headline(issue[:project_id])
+
+        parent_headline.add_subheadline(title: "##{issue[:id]} - #{issue[:subject]}", todo: 'TODO')
+      end
+    end
+    file.save
+
+    ap(merged_issues_diff: merged_issues_diff)
+
+    # 2. apply merged_diff to remote
+    merged_issues_diff.each do |issue|
+      redmine_issue =
+        RedmineApi::Issue.find(issue[:id])
+      redmine_issue.subject = issue[:subject] if issue[:subject]
+      redmine_issue.tracker_id = issue[:tracker_id] if issue[:tracker_id]
+      redmine_issue.save!
+    end
+
+    # 3. apply merged_diff to cache and save cache
+    cache.apply_issues_diff(merged_issues_diff)
+    cache.save
+  end
 
   def get_local_versions
     versions = []
