@@ -1,4 +1,6 @@
 require 'org/helpers'
+require 'org/buffer'
+require 'org/position'
 require 'org/file'
 require 'org/properties'
 require 'org/property'
