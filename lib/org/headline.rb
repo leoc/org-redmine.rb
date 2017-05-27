@@ -201,6 +201,16 @@ module Org
       file.find_ancestor_if(offset: beginning, level: (level - 1), &block)
     end
 
+    def each_child(any: false)
+      level = any ? ((self.level + 1)..999) : (self.level + 1)
+      limit = level_ending
+      child_heading = file.find_headline(offset: ending, limit: limit, level: level)
+      while child_heading
+        yield(child_heading)
+        child_heading = file.find_headline(offset: child_heading.ending, limit: limit, level: level)
+      end
+    end
+
     def add_subheadline(options = {}, &block)
       headline = Headline.new(
         file,

@@ -229,7 +229,33 @@ describe Org::Headline do
   end
 
   describe '#append_subheading' do
+  describe '#each_child' do
+    let(:file) { Org::File.new('./spec/files/headline_level_spec.org') }
+    let(:headlines) { file.headlines }
 
+    it 'finds each child' do
+      titles = []
+      headlines[0].each_child do |child|
+        titles << child.title
+      end
+      expect(titles).to eq(['First Sub', 'Second Sub'])
+    end
+
+    it 'finds any child' do
+      titles = []
+      headlines[0].each_child(any: true) do |child|
+        titles << child.title
+      end
+      expect(titles).to eq(['First Sub', 'Second Sub', 'First SubSub', 'First SubSubSub'])
+    end
+
+    it 'finds any child' do
+      titles = []
+      headlines[2].each_child(any: true) do |child|
+        titles << child.title
+      end
+      expect(titles).to eq(['First SubSub', 'First SubSubSub'])
+    end
   end
 
   describe 'Redmine' do
