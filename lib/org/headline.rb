@@ -92,18 +92,13 @@ module Org
     def inherited_tags
       tags = []
       each_ancestor do |headline|
-        parent_tags = headline.direct_tags - OrgRedmine.config.tags_exclude_from_inheritance
-        tags.push(*parent_tags)
+        tags.concat(headline.direct_tags - OrgRedmine.config.tags_exclude_from_inheritance)
       end
       tags.uniq
     end
 
     def tags
-      tags = direct_tags
-      each_ancestor do |headline|
-        tags.concat(headline.direct_tags - OrgRedmine.config.tags_exclude_from_inheritance)
-      end
-      tags.uniq
+      (direct_tags + inherited_tags).uniq
     end
 
     def redmine_issue?
