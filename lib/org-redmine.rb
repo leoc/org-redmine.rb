@@ -79,7 +79,7 @@ class OrgRedmine
       issue = {
         project: project.redmine_project_id,
         tracker: extract_tracker(headline.tags),
-        version: version.sanitized_title,
+        version: version&.sanitized_title || 'n/a',
         subject: headline.sanitized_title,
         parent_issue: parent&.redmine_issue_id,
         assigned_to: "#{@user.firstname} #{@user.lastname}"
