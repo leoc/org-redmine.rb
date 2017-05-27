@@ -118,8 +118,13 @@ module Org
       !properties[:redmine_project_id].nil?
     end
 
+    def redmine_project
+      ancestor_if(&:redmine_project?)
+    end
+
     def redmine_project_id
-      properties[:redmine_project_id]
+      return properties[:redmine_project_id] if redmine_project?
+      redmine_project.try(:redmine_project_id)
     end
 
     def redmine_version?

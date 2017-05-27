@@ -346,12 +346,28 @@ FILE
       it 'updates the associated Org::File'
     end
 
-    describe '#redmine_project' do
-      it 'returns the redmine project identifier'
+    describe '#redmine_project?' do
+      it 'returns the redmine project identifier' do
+        expect(headlines[0].redmine_project?).to be_truthy
+        expect(headlines[1].redmine_project?).to be_falsy
+        expect(headlines[2].redmine_project?).to be_falsy
+        expect(headlines[3].redmine_project?).to be_falsy
+      end
     end
 
-    describe '#redmine_project=' do
-      it 'updates the associated Org::File'
+    describe '#redmine_project_id' do
+      it 'returns the redmine project identifier' do
+        expect(headlines[0].redmine_project_id).to eq('some_project')
+        expect(headlines[1].redmine_project_id).to eq('some_project')
+        expect(headlines[2].redmine_project_id).to eq('some_project')
+        expect(headlines[3].redmine_project_id).to eq('some_project')
+      end
+    end
+
+    describe '#redmine_project_id=' do
+      it 'updates the associated Org::File' do
+
+      end
     end
 
     describe '#redmine_tracker' do
