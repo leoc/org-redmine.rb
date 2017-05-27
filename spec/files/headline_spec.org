@@ -1,3 +1,4 @@
+#+ORG_REDMINE_TRACKERS: @bug:1 @feature:2 @support:3 !@task:4 @feedback:5 @planning:6 @doc:7 @requirement:8
 * First Parent                                                    :inherited:
 ** TODO First Sub
 ** NEXT Second Sub

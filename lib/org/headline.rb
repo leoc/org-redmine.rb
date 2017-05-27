@@ -140,6 +140,20 @@ module Org
       file.redmine_trackers[tracker_tag]
     end
 
+    def redmine_tracker=(tracker)
+      tracker_tag =
+        if tracker.is_a?(Integer)
+          file.redmine_trackers.key(tracker)
+        elsif tracker[0] == '@'
+          tracker
+        else
+          "@#{tracker}"
+        end
+      tags_without_tracker =
+        direct_tags.reject { |tag| tag[0] == '@' }
+      self.tags = [tracker_tag] + tags_without_tracker
+    end
+
     def tags=(new_tags)
       str = string
       match = str.match(REGEXP)

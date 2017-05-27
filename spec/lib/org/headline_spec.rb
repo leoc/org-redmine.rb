@@ -354,12 +354,24 @@ FILE
       it 'updates the associated Org::File'
     end
 
-    describe '#redmine_tracker_id' do
-      it 'returns the redmine tracker id'
+    describe '#redmine_tracker' do
+      it 'returns the redmine tracker' do
+        expect(headlines[1].redmine_tracker).to eq(4)
+        expect(headlines[2].redmine_tracker).to eq(4)
+        expect(headlines[3].redmine_tracker).to eq(2)
+        expect(headlines[5].redmine_tracker).to eq(4)
+      end
     end
 
-    describe '#redmine_tracker_id=' do
-      it 'updates the associated Org::File'
+    describe '#redmine_tracker=' do
+      it 'updates the associated Org::File' do
+        headlines[3].redmine_tracker = 'bug'
+        expect(file.send(:file)).to include('*** DONE First SubSub                                            :@bug:')
+        headlines[3].redmine_tracker = 1
+        expect(file.send(:file)).to include('*** DONE First SubSub                                            :@bug:')
+        headlines[3].redmine_tracker = '@bug'
+        expect(file.send(:file)).to include('*** DONE First SubSub                                            :@bug:')
+      end
     end
 
     describe '#redmine_version_id' do
