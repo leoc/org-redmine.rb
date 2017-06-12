@@ -180,13 +180,13 @@ module Org
     end
 
     def contents_beginning
-      ending
+      ending.to_i
     end
 
     def contents_ending
       next_headline = file.find_headline(offset: ending)
       if next_headline
-        next_headline.beginning - 1
+        next_headline.beginning.to_i - 1
       else
         file.length
       end
@@ -196,14 +196,14 @@ module Org
       next_heading =
         file.find_headline(offset: ending, level: (1..level))
       if next_heading
-        next_heading.beginning - 1
+        next_heading.beginning
       else
         file.length
       end
     end
 
     def contents
-      file[contents_beginning...contents_ending]
+      file.buffer[contents_beginning...contents_ending]
         .gsub(properties.string, '')
         .gsub(/\A\n/, '')
     end

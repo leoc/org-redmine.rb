@@ -6,51 +6,35 @@ require 'org/clock'
 
 module Org
   class File # :nodoc:
+    extend Forwardable
     attr_accessor :filename, :redmine_trackers
+    attr_reader :buffer
+
+    def_delegators :@buffer, :insert, :delete, :replace, :length, :slice, :position
 
     def initialize(filename)
       @filename = filename
-      @file = ::File.read(::File.expand_path(filename))
+      @buffer = Org::Buffer.new(::File.read(::File.expand_path(filename)))
 
       load_redmine_tracker_associations
     end
 
     def load_redmine_tracker_associations
       @redmine_trackers = {}
-      beginning = @file.index(/^#\+ORG_REDMINE_TRACKERS:/)
+      beginning = buffer.index(/^#\+ORG_REDMINE_TRACKERS:/)
       return unless beginning
-      ending = @file.index("\n", beginning)
-      value = @file[beginning + '#+ORG_REDMINE_TRACKERS:'.length ... ending].strip
-      value.split(" ").each do |pair|
+      ending = buffer.index("\n", beginning)
+      value = buffer[beginning + '#+ORG_REDMINE_TRACKERS:'.length ... ending].strip
+      value.split(' ').each do |pair|
         tag, id = pair.split(':')
         @redmine_trackers[nil] = id.to_i if tag[0] == '!'
         @redmine_trackers[tag.gsub(/^!/, '')] = id.to_i
       end
     end
 
-    def [](*args)
-      file[*args]
-    end
-
-    def length
-      file.length
-    end
-
-    def insert(pos, str)
-      pre = file[0...pos]
-      post = file[pos...file.length]
-      @file = pre + str + post
-    end
-
-    def replace(beginning, ending, str)
-      pre = file[0...beginning]
-      post = file[ending...file.length]
-      @file = pre + str + post
-    end
-
     def save
       ::File.open(filename, 'w') do |file|
-        file.write(@file)
+        file.write(@buffer.string)
       end
     end
 
@@ -196,8 +180,6 @@ module Org
 
     private
 
-    attr_reader :file
-
     def scan(obj, options = {})
       if options[:reverse]
         scan_backward(obj, options)
@@ -208,16 +190,16 @@ module Org
 
     def scan_forward(obj, options = {})
       offset = options[:offset] || 0
-      pos = file.index(obj, offset || 0)
-      return if pos && options[:limit] && pos > options[:limit]
-      return file.length if pos && pos >= file.length
+      pos = buffer.index(obj, offset.to_i || 0)
+      return if pos && options[:limit] && pos > options[:limit].to_i
+      return buffer.length if pos && pos >= buffer.length
       pos
     end
 
     def scan_backward(obj, options = {})
-      offset = options[:offset] || file.length
-      pos = file.rindex(obj, offset || file.length)
-      return if pos && options[:limit] && pos < options[:limit]
+      offset = options[:offset] || buffer.length
+      pos = buffer.rindex(obj, offset.to_i || buffer.length)
+      return if pos && options[:limit] && pos < options[:limit].to_i
       return 0 if pos && pos <= 0
       pos
     end

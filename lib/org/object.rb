@@ -4,17 +4,16 @@ module Org
 
     def initialize(file, beginning, ending)
       @file = file
-      @beginning = beginning
-      @ending = ending
+      @beginning = file.position(beginning)
+      @ending = file.position(ending)
     end
 
     def string
-      file[beginning...ending]
+      file.buffer.substring(beginning, ending)
     end
 
     def string=(string)
-      @file.replace(beginning, ending, string)
-      @ending = beginning + string.length
+      file.buffer.replace(beginning, ending, string)
     end
   end
 end

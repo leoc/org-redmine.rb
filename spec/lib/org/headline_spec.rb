@@ -19,7 +19,7 @@ describe Org::Headline do
 
     it 'decreases level' do
       headlines[6].level = 1
-      expect(file.send(:file)).to eq(<<FILE)
+      expect(file.buffer.string).to eq(<<FILE)
 * First Parent                                                    :inherited:
 ** TODO First Sub
 ** NEXT Second Sub
@@ -38,7 +38,7 @@ FILE
 
     it 'decreases the level of subheadings accordingly' do
       headlines[2].level = 1
-      expect(file.send(:file)).to eq(<<FILE)
+      expect(file.buffer.string).to eq(<<FILE)
 * First Parent                                                    :inherited:
 ** TODO First Sub
 * NEXT Second Sub
@@ -57,7 +57,7 @@ FILE
 
     it 'increases level' do
       headlines[5].level = 2
-      expect(file.send(:file)).to eq(<<FILE)
+      expect(file.buffer.string).to eq(<<FILE)
 * First Parent                                                    :inherited:
 ** TODO First Sub
 ** NEXT Second Sub
@@ -76,7 +76,7 @@ FILE
 
     it 'increases the level of subheadings accordingly' do
       headlines[2].level = 3
-      expect(file.send(:file)).to eq(<<FILE)
+      expect(file.buffer.string).to eq(<<FILE)
 * First Parent                                                    :inherited:
 ** TODO First Sub
 *** NEXT Second Sub
@@ -270,12 +270,12 @@ FILE
 
   describe '#level_ending' do
     it 'returns end of level' do
-      expect(headlines[0].level_ending).to eq(190)
-      expect(headlines[1].level_ending).to eq(95)
-      expect(headlines[2].level_ending).to eq(190)
-      expect(headlines[3].level_ending).to eq(190)
-      expect(headlines[4].level_ending).to eq(309)
-      expect(headlines[5].level_ending).to eq(309)
+      expect(headlines[0].level_ending.to_i).to eq(191)
+      expect(headlines[1].level_ending.to_i).to eq(96)
+      expect(headlines[2].level_ending.to_i).to eq(191)
+      expect(headlines[3].level_ending.to_i).to eq(191)
+      expect(headlines[4].level_ending.to_i).to eq(309)
+      expect(headlines[5].level_ending.to_i).to eq(309)
     end
   end
 
@@ -382,11 +382,11 @@ FILE
     describe '#redmine_tracker=' do
       it 'updates the associated Org::File' do
         headlines[3].redmine_tracker = 'bug'
-        expect(file.send(:file)).to include('*** DONE First SubSub                                            :@bug:')
+        expect(file.buffer.string).to include('*** DONE First SubSub                                            :@bug:')
         headlines[3].redmine_tracker = 1
-        expect(file.send(:file)).to include('*** DONE First SubSub                                            :@bug:')
+        expect(file.buffer.string).to include('*** DONE First SubSub                                            :@bug:')
         headlines[3].redmine_tracker = '@bug'
-        expect(file.send(:file)).to include('*** DONE First SubSub                                            :@bug:')
+        expect(file.buffer.string).to include('*** DONE First SubSub                                            :@bug:')
       end
     end
 
