@@ -39,6 +39,11 @@ module Org
       offset_positions(pos2, str.length - (pos2 - pos1))
     end
 
+    def substring(pos1, pos2)
+      pos1, pos2 = pos1.to_i, pos2.to_i
+      string.slice(pos1...pos2)
+    end
+
     def find_position(position)
       found_at = positions.find_index { |pos| pos.value == position }
       positions[found_at] if found_at
