@@ -136,8 +136,20 @@ module Org
       !properties[:redmine_version_id].nil?
     end
 
+    def redmine_version
+      ancestor_if(&:redmine_version?)
+    end
+
     def redmine_version_id
-      properties[:redmine_version_id].try(:to_i)
+      return properties[:redmine_version_id].try(:to_i) if redmine_version?
+      redmine_version.try(:redmine_version_id).try(:to_i)
+    end
+
+    def redmine_version_id=(version_id)
+      return redmine_project.append_heading(self) if version_id.nil?
+      return if redmine_version_id == version_id.to_i
+      heading = file.find_version_headline(version_id)
+      heading.append_heading(self)
     end
 
     def redmine_tracker

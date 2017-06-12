@@ -1,0 +1,36 @@
+#+ORG_REDMINE_TRACKERS: @bug:1 @feature:2 @support:3 !@task:4 @feedback:5 @planning:6 @doc:7 @requirement:8
+* First Parent                                                    :inherited:
+:PROPERTIES:
+:redmine_project_id: some_project
+:END:
+** Version 1                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 1
+:END:
+*** NEXT # - Parent Issue
+**** DONE # - Sub Issue                                         :@feature:
+** Version 2                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 2
+:END:
+* Second Parent
+:PROPERTIES:
+:redmine_project_id: other_project
+:END:
+Some contents for this heading.
+** Third Parent
+:PROPERTIES:
+:redmine_project_id: nested_project
+:END:
+*** Version 3                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 3
+:END:
+**** TODO # - Super Issue
+*** TODO # - Other Issue
+** Version 4                                                     :milestone:
+:PROPERTIES:
+:redmine_version_id: 4
+:END:
+** TODO # - Some Issue
+Some description.

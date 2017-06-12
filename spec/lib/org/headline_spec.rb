@@ -448,11 +448,213 @@ FILE
     end
 
     describe '#redmine_version_id' do
-      it 'returns the redmine version id'
+      let(:file) { Org::File.new('./spec/files/redmine_headline_version_spec.org') }
+      let(:headlines) { file.headlines }
+
+      it 'returns the redmine version id' do
+        expect(headlines[0].redmine_version_id).to be_nil
+        expect(headlines[1].redmine_version_id).to eq(1)
+        expect(headlines[2].redmine_version_id).to eq(1)
+        expect(headlines[3].redmine_version_id).to eq(1)
+        expect(headlines[4].redmine_version_id).to eq(2)
+        expect(headlines[5].redmine_version_id).to be_nil
+        expect(headlines[6].redmine_version_id).to be_nil
+        expect(headlines[7].redmine_version_id).to eq(3)
+        expect(headlines[8].redmine_version_id).to eq(3)
+        expect(headlines[9].redmine_version_id).to be_nil
+        expect(headlines[10].redmine_version_id).to eq(4)
+        expect(headlines[11].redmine_version_id).to be_nil
+      end
     end
 
     describe '#redmine_version_id=' do
-      it 'updates the associated Org::File'
+      let(:file) { Org::File.new('./spec/files/redmine_headline_version_spec.org') }
+      let(:headlines) { file.headlines }
+
+      describe 'setting to nil' do
+        before(:each) do
+          headlines[2].redmine_version_id = nil
+        end
+
+        it 'updates the associated Org::File' do
+          expect(file.buffer.string).to eq(<<FILE)
+#+ORG_REDMINE_TRACKERS: @bug:1 @feature:2 @support:3 !@task:4 @feedback:5 @planning:6 @doc:7 @requirement:8
+* First Parent                                                    :inherited:
+:PROPERTIES:
+:redmine_project_id: some_project
+:END:
+** Version 1                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 1
+:END:
+** Version 2                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 2
+:END:
+** NEXT # - Parent Issue
+*** DONE # - Sub Issue                                         :@feature:
+* Second Parent
+:PROPERTIES:
+:redmine_project_id: other_project
+:END:
+Some contents for this heading.
+** Third Parent
+:PROPERTIES:
+:redmine_project_id: nested_project
+:END:
+*** Version 3                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 3
+:END:
+**** TODO # - Super Issue
+*** TODO # - Other Issue
+** Version 4                                                     :milestone:
+:PROPERTIES:
+:redmine_version_id: 4
+:END:
+** TODO # - Some Issue
+Some description.
+FILE
+        end
+      end
+      describe 'setting to same projects same version' do
+        before(:each) do
+          headlines[2].redmine_version_id = 1
+        end
+
+        it 'updates the associated Org::File' do
+          expect(file.buffer.string).to eq(<<FILE)
+#+ORG_REDMINE_TRACKERS: @bug:1 @feature:2 @support:3 !@task:4 @feedback:5 @planning:6 @doc:7 @requirement:8
+* First Parent                                                    :inherited:
+:PROPERTIES:
+:redmine_project_id: some_project
+:END:
+** Version 1                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 1
+:END:
+*** NEXT # - Parent Issue
+**** DONE # - Sub Issue                                         :@feature:
+** Version 2                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 2
+:END:
+* Second Parent
+:PROPERTIES:
+:redmine_project_id: other_project
+:END:
+Some contents for this heading.
+** Third Parent
+:PROPERTIES:
+:redmine_project_id: nested_project
+:END:
+*** Version 3                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 3
+:END:
+**** TODO # - Super Issue
+*** TODO # - Other Issue
+** Version 4                                                     :milestone:
+:PROPERTIES:
+:redmine_version_id: 4
+:END:
+** TODO # - Some Issue
+Some description.
+FILE
+        end
+      end
+      describe 'setting to same projects other version' do
+        before(:each) do
+          headlines[2].redmine_version_id = 2
+        end
+
+        it 'updates the associated Org::File' do
+          expect(file.buffer.string).to eq(<<FILE)
+#+ORG_REDMINE_TRACKERS: @bug:1 @feature:2 @support:3 !@task:4 @feedback:5 @planning:6 @doc:7 @requirement:8
+* First Parent                                                    :inherited:
+:PROPERTIES:
+:redmine_project_id: some_project
+:END:
+** Version 1                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 1
+:END:
+** Version 2                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 2
+:END:
+*** NEXT # - Parent Issue
+**** DONE # - Sub Issue                                         :@feature:
+* Second Parent
+:PROPERTIES:
+:redmine_project_id: other_project
+:END:
+Some contents for this heading.
+** Third Parent
+:PROPERTIES:
+:redmine_project_id: nested_project
+:END:
+*** Version 3                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 3
+:END:
+**** TODO # - Super Issue
+*** TODO # - Other Issue
+** Version 4                                                     :milestone:
+:PROPERTIES:
+:redmine_version_id: 4
+:END:
+** TODO # - Some Issue
+Some description.
+FILE
+        end
+      end
+      describe 'setting to other projects version' do
+        before(:each) do
+          headlines[2].redmine_version_id = 3
+        end
+
+        it 'updates the associated Org::File' do
+          expect(file.buffer.string).to eq(<<FILE)
+#+ORG_REDMINE_TRACKERS: @bug:1 @feature:2 @support:3 !@task:4 @feedback:5 @planning:6 @doc:7 @requirement:8
+* First Parent                                                    :inherited:
+:PROPERTIES:
+:redmine_project_id: some_project
+:END:
+** Version 1                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 1
+:END:
+** Version 2                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 2
+:END:
+* Second Parent
+:PROPERTIES:
+:redmine_project_id: other_project
+:END:
+Some contents for this heading.
+** Third Parent
+:PROPERTIES:
+:redmine_project_id: nested_project
+:END:
+*** Version 3                                                   :milestone:
+:PROPERTIES:
+:redmine_version_id: 3
+:END:
+**** TODO # - Super Issue
+**** NEXT # - Parent Issue
+***** DONE # - Sub Issue                                         :@feature:
+*** TODO # - Other Issue
+** Version 4                                                     :milestone:
+:PROPERTIES:
+:redmine_version_id: 4
+:END:
+** TODO # - Some Issue
+Some description.
+FILE
+        end
+      end
     end
   end
 end
