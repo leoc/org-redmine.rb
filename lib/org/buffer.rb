@@ -16,6 +16,7 @@ module Org
     end
 
     def insert(pos, str)
+      pos = pos.to_i
       pre = string[0...pos]
       post = string[pos...string.length]
       @string = pre + str + post
@@ -23,12 +24,14 @@ module Org
     end
 
     def delete(pos1, pos2)
+      pos1, pos2 = pos1.to_i, pos2.to_i
       string[pos1...pos2] = ''
       remove_positions(pos1, pos2)
       offset_positions(pos2, pos1 - pos2)
     end
 
     def replace(pos1, pos2, str)
+      pos1, pos2 = pos1.to_i, pos2.to_i
       string[pos1...pos2] = str
       remove_positions(pos1, pos2)
       offset_positions(pos2, str.length - (pos2 - pos1))
