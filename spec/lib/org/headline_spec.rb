@@ -338,6 +338,9 @@ FILE
   end
 
   describe 'Redmine' do
+    let(:file) { Org::File.new('./spec/files/redmine_headline_spec.org') }
+    let(:headlines) { file.headlines }
+
     describe '#redmine_issue_id' do
       it 'returns the redmine issue ids'
     end
@@ -365,8 +368,62 @@ FILE
     end
 
     describe '#redmine_project_id=' do
-      it 'updates the associated Org::File' do
+      it 'moves the headline to the specific project Headline' do
+        headlines[2].redmine_project_id = 'other_project'
+        expect(file.buffer.string).to eq(<<FILE)
+#+ORG_REDMINE_TRACKERS: @bug:1 @feature:2 @support:3 !@task:4 @feedback:5 @planning:6 @doc:7 @requirement:8
+* First Parent                                                    :inherited:
+:PROPERTIES:
+:redmine_project_id: some_project
+:END:
+** TODO First Sub
+* Second Parent
+:PROPERTIES:
+:redmine_project_id: other_project
+:END:
+Some contents for this heading.
 
+** TODO Third Sub
+:PROPERTIES:
+:STYLE: habit
+:END:
+Some description.
+** Third Parent
+:PROPERTIES:
+:redmine_project_id: nested_project
+:END:
+** NEXT Second Sub
+*** DONE First SubSub                                            :@feature:
+FILE
+      end
+
+      it 'increases level according to project heading level' do
+        headlines[2].redmine_project_id = 'nested_project'
+        expect(file.buffer.string).to eq(<<FILE)
+#+ORG_REDMINE_TRACKERS: @bug:1 @feature:2 @support:3 !@task:4 @feedback:5 @planning:6 @doc:7 @requirement:8
+* First Parent                                                    :inherited:
+:PROPERTIES:
+:redmine_project_id: some_project
+:END:
+** TODO First Sub
+* Second Parent
+:PROPERTIES:
+:redmine_project_id: other_project
+:END:
+Some contents for this heading.
+
+** TODO Third Sub
+:PROPERTIES:
+:STYLE: habit
+:END:
+Some description.
+** Third Parent
+:PROPERTIES:
+:redmine_project_id: nested_project
+:END:
+*** NEXT Second Sub
+**** DONE First SubSub                                            :@feature:
+FILE
       end
     end
 

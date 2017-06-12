@@ -127,6 +127,11 @@ module Org
       redmine_project.try(:redmine_project_id)
     end
 
+    def redmine_project_id=(identifier)
+      heading = file.find_project_headline(identifier)
+      heading.append_heading(self)
+    end
+
     def redmine_version?
       !properties[:redmine_version_id].nil?
     end
@@ -251,6 +256,15 @@ module Org
         options.merge(level: (level + 1))
       )
       yield(headline) if block_given?
+    end
+
+    def move(new_beginning)
+      file.buffer.move(beginning, level_ending, new_beginning)
+    end
+
+    def append_heading(heading)
+      heading.move(level_ending)
+      heading.level = (level + 1)
     end
   end
 end
