@@ -1,6 +1,10 @@
 module Org
   class Buffer
+    extend Forwardable
+
     attr_reader(:positions, :string)
+
+    def_delegators :@string, :[], :[]=, :length, :index, :rindex, :slice
 
     def initialize(string)
       @string = string
