@@ -25,9 +25,11 @@ module Org
 
     def delete(pos1, pos2)
       pos1, pos2 = pos1.to_i, pos2.to_i
+      deletable_string = string[pos1...pos2]
       string[pos1...pos2] = ''
       remove_positions(pos1, pos2)
       offset_positions(pos2, pos1 - pos2)
+      deletable_string
     end
 
     def replace(pos1, pos2, str)
