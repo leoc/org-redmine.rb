@@ -74,4 +74,85 @@ FILE
       expect(buffer.positions.map(&:value)).to eq([0, 35, 48])
     end
   end
+
+  describe '#move' do
+    describe 'to earlier position' do
+      before(:each) do
+        buffer.move(15, 33, 46)
+      end
+
+      it 'moves substring to new position' do
+        expect(buffer.string).to eq(<<FILE)
+* First Parent
+** SecondSub
+** Sub
+*** SubSub
+* Second Parent
+FILE
+      end
+      it 'updates positions' do
+        expect(buffer.positions.map(&:value)).to eq([0, 15, 28, 35, 46])
+      end
+    end
+    describe 'to end of file' do
+      before(:each) do
+        buffer.move(15, 33, 62)
+      end
+
+      it 'moves substring to new position' do
+        expect(buffer.string).to eq(<<FILE)
+* First Parent
+** SecondSub
+* Second Parent
+** Sub
+*** SubSub
+FILE
+      end
+      it 'updates positions' do
+        expect(buffer.positions.map(&:value)).to eq([0, 15, 28, 44, 51])
+      end
+    end
+    describe 'to later position' do
+      let(:buffer) do
+        Org::Buffer.new(<<FILE)
+* First Parent
+** Sub
+*** SubSub
+** SecondSub
+* Second Parent
+** OtherSub
+*** SubSubSubSub
+FILE
+      end
+
+      before(:each) do
+        buffer.position(0)
+        buffer.position(15)
+        buffer.position(22)
+        buffer.position(33)
+        buffer.position(46)
+        buffer.position(62)
+        buffer.position(74)
+      end
+
+      before(:each) do
+        buffer.move(62, 91, 33)
+      end
+
+      it 'moves substring to new position' do
+        expect(buffer.string).to eq(<<FILE)
+* First Parent
+** Sub
+*** SubSub
+** OtherSub
+*** SubSubSubSub
+** SecondSub
+* Second Parent
+FILE
+      end
+      it 'updates positions' do
+        expect(buffer.positions.map(&:value)).to eq([0, 15, 22, 33, 45, 62, 75])
+      end
+    end
+  end
 end

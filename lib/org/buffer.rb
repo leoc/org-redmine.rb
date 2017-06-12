@@ -44,18 +44,45 @@ module Org
       string.slice(pos1...pos2)
     end
 
+    def move(pos1, pos2, new_pos)
+      pos1, pos2, new_pos = pos1.to_i, pos2.to_i, new_pos.to_i
+      movable_string = string[pos1...pos2]
+      string[pos1...pos2] = ''
+      new_pos -= pos2 - pos1 if pos2 < new_pos
+      string[new_pos, 0] = movable_string
+      move_positions(pos1, pos2, new_pos)
+    end
+
+    private
+
     def find_position(position)
       found_at = positions.find_index { |pos| pos.value == position }
       positions[found_at] if found_at
+    end
+
+    def move_positions(pos1, pos2, new_pos)
+      movable_positions = positions.select { |pos| pos1 <= pos.value && pos.value < pos2}
+      remove_positions(pos1, pos2)
+      offset_positions(pos2, pos1 - pos2)
+      offset_positions(new_pos, (pos2 - pos1))
+      movable_positions.each do |pos|
+        pos.value = (pos.value - pos1) + new_pos
+        reinsert_position(pos)
+      end
     end
 
     def insert_position(new_position)
       insert_at = positions.index { |pos| pos.value > new_position }
       new_position = Position.new(self, new_position)
       positions.insert(insert_at || positions.length, new_position)
+      new_position
     end
 
-    private
+    def reinsert_position(position)
+      insert_at = positions.index { |pos| pos.value > position.to_i }
+      positions.insert(insert_at || positions.length, position)
+      position
+    end
 
     def remove_positions(lower, upper)
       positions.reject! { |pos| lower <= pos.value && pos.value < upper }
