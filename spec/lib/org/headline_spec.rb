@@ -342,11 +342,40 @@ FILE
     let(:headlines) { file.headlines }
 
     describe '#redmine_issue_id' do
-      it 'returns the redmine issue ids'
+      let(:file) { Org::File.new('./spec/files/redmine_headline_issue_spec.org') }
+      let(:headlines) { file.headlines }
+
+      it 'returns the redmine issue ids' do
+        expect(headlines[0].redmine_issue_id).to be_nil
+        expect(headlines[1].redmine_issue_id).to be_nil
+        expect(headlines[2].redmine_issue_id).to eq(125)
+        expect(headlines[3].redmine_issue_id).to eq(130)
+        expect(headlines[4].redmine_issue_id).to be_nil
+        expect(headlines[5].redmine_issue_id).to be_nil
+        expect(headlines[6].redmine_issue_id).to be_nil
+        expect(headlines[7].redmine_issue_id).to be_nil
+        expect(headlines[8].redmine_issue_id).to eq(111)
+        expect(headlines[9].redmine_issue_id).to eq(99)
+        expect(headlines[10].redmine_issue_id).to be_nil
+        expect(headlines[11].redmine_issue_id).to be_nil
+      end
     end
 
     describe '#redmine_issue_id=' do
-      it 'updates the associated Org::File'
+      let(:file) { Org::File.new('./spec/files/redmine_headline_issue_spec.org') }
+      let(:headlines) { file.headlines }
+
+      it 'updates the associated Org::File' do
+        headlines[11].redmine_issue_id = 200
+        expect(file.buffer.string).to include(<<ISSUE)
+** TODO #200 - Some Issue
+ISSUE
+        headlines[2].redmine_issue_id = 300
+        expect(file.buffer.string).to include(<<ISSUE.strip)
+*** NEXT #300 - Parent Issue
+**** DONE #130 - Sub Issue
+ISSUE
+      end
     end
 
     describe '#redmine_project?' do
