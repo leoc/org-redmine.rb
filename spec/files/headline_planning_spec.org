@@ -1,7 +1,11 @@
 * First Parent                                                    :inherited:
-** TODO First Sub
+** DONE First Sub
+CLOSED: [2017-06-19 Mon 14:18] SCHEDULED: <2017-06-16 Fri> DEADLINE: <2017-07-01 Sat>
+
 ** NEXT Second Sub
 *** DONE First SubSub                                            :@feature:
+DEADLINE: <2017-06-24 Wed>
+
 * Second Parent
 Some contents for this heading.
 

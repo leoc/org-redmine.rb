@@ -101,6 +101,30 @@ module Org
       (direct_tags + inherited_tags).uniq
     end
 
+    def scheduled_at
+      planning['SCHEDULED']
+    end
+
+    def scheduled_at=(new_date)
+      planning['SCHEDULED'] = new_date
+    end
+
+    def deadline_at
+      planning['DEADLINE']
+    end
+
+    def deadline_at=(new_date)
+      planning['DEADLINE'] = new_date
+    end
+
+    def closed_at
+      planning['CLOSED']
+    end
+
+    def closed_at=(new_date)
+      planning['CLOSED'] = new_date
+    end
+
     def redmine_issue?
       !match[:title].match(/^#(\d+)? -/).nil?
     end
@@ -222,6 +246,7 @@ module Org
     def contents
       file.buffer[contents_beginning...contents_ending]
         .gsub(properties.string, '')
+        .gsub(Org::Planning::LINE_REGEX, '')
         .gsub(/\A\n/, '')
     end
 
@@ -240,6 +265,11 @@ module Org
         offset: contents_beginning,
         limit: contents_ending
       )
+    end
+
+    def planning
+      line_ending = file.scan("\n", offset: ending + 1)
+      Org::Planning.new(file, ending.to_i, line_ending)
     end
 
     def each_ancestor(&block)

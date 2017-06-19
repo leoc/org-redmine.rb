@@ -223,6 +223,93 @@ FILE
     end
   end
 
+  describe '#scheduled_at' do
+    let(:file) { Org::File.new('./spec/files/headline_planning_spec.org') }
+    let(:headlines) { file.headlines }
+
+    it 'returns date' do
+      expect(headlines[1].scheduled_at).to eq(Date.new(2017, 6, 16))
+      expect(headlines[3].scheduled_at).to be_nil
+      expect(headlines[5].scheduled_at).to eq(Date.new(2017, 6, 14))
+    end
+  end
+
+  describe '#scheduled_at=' do
+    let(:file) { Org::File.new('./spec/files/headline_planning_spec.org') }
+    let(:headlines) { file.headlines }
+
+    it 'changes the exisiting scheduled at date' do
+      headlines[5].scheduled_at = Date.new(2017, 6, 21)
+      expect(file.buffer.string).to include(<<LINE)
+SCHEDULED: <2017-06-21 Wed>
+LINE
+    end
+    it 'adds new scheduled date' do
+      headlines[2].scheduled_at = Date.new(2017, 9, 1)
+      expect(file.buffer.string).to include(<<LINE)
+** NEXT Second Sub
+SCHEDULED: <2017-09-01 Fri>
+LINE
+    end
+    it 'removes existing scheduled date' do
+      headlines[1].scheduled_at = nil
+      expect(file.buffer.string).to include(<<LINE)
+** DONE First Sub
+CLOSED: [2017-06-19 Mon 14:18] DEADLINE: <2017-07-01 Sat>
+LINE
+      headlines[5].scheduled_at = nil
+      expect(file.buffer.string).to include(<<LINE)
+** TODO Third Sub
+:PROPERTIES:
+:STYLE: habit
+:END:
+LINE
+    end
+  end
+
+  describe '#deadline_at' do
+    let(:file) { Org::File.new('./spec/files/headline_planning_spec.org') }
+    let(:headlines) { file.headlines }
+
+    it 'returns the date if available' do
+      expect(headlines[1].deadline_at).to eq(Date.new(2017, 7, 1))
+      expect(headlines[3].deadline_at).to eq(Date.new(2017, 6, 24))
+      expect(headlines[5].deadline_at).to be_nil
+    end
+  end
+
+  describe '#deadline_at=' do
+    let(:file) { Org::File.new('./spec/files/headline_planning_spec.org') }
+    let(:headlines) { file.headlines }
+
+    it 'changes the exisiting deadline at date' do
+      headlines[1].deadline_at = Date.new(2017, 8, 1)
+      expect(file.buffer.string).to include(<<LINE)
+** DONE First Sub
+CLOSED: [2017-06-19 Mon 14:18] SCHEDULED: <2017-06-16 Fri> DEADLINE: <2017-08-01 Tue>
+LINE
+    end
+    it 'adds new deadline date' do
+      headlines[2].deadline_at = Date.new(2017, 9, 1)
+      expect(file.buffer.string).to include(<<LINE)
+** NEXT Second Sub
+DEADLINE: <2017-09-01 Fri>
+LINE
+    end
+    it 'removes existing deadline date' do
+      headlines[1].deadline_at = nil
+      expect(file.buffer.string).to include(<<LINE)
+** DONE First Sub
+CLOSED: [2017-06-19 Mon 14:18] SCHEDULED: <2017-06-16 Fri>
+LINE
+      headlines[3].deadline_at = nil
+      expect(file.buffer.string).to include(<<LINE)
+*** DONE First SubSub                                            :@feature:
+
+LINE
+    end
+  end
+
   describe '#todo' do
     it 'returns true if given tag is found in inherited tags' do
       expect(headlines[0].todo).to eq(nil)
@@ -264,7 +351,7 @@ FILE
       expect(headlines[2].contents_ending).to eq(114)
       expect(headlines[3].contents_ending).to eq(190)
       expect(headlines[4].contents_ending).to eq(239)
-      expect(headlines[5].contents_ending).to eq(309)
+      expect(headlines[5].contents_ending).to eq(337)
     end
   end
 
@@ -274,8 +361,8 @@ FILE
       expect(headlines[1].level_ending.to_i).to eq(96)
       expect(headlines[2].level_ending.to_i).to eq(191)
       expect(headlines[3].level_ending.to_i).to eq(191)
-      expect(headlines[4].level_ending.to_i).to eq(309)
-      expect(headlines[5].level_ending.to_i).to eq(309)
+      expect(headlines[4].level_ending.to_i).to eq(337)
+      expect(headlines[5].level_ending.to_i).to eq(337)
     end
   end
 
