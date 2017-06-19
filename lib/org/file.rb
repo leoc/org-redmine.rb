@@ -178,8 +178,6 @@ module Org
       Org::Clock.new(self, beginning, ending)
     end
 
-    private
-
     def scan(obj, options = {})
       if options[:reverse]
         scan_backward(obj, options)
