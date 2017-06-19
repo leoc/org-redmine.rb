@@ -48,7 +48,7 @@ class OrgRedmine
 
   def clean_issue(issue)
     issue.select do |key, value|
-      %i(id version_id project_id tracker_id subject).include?(key)
+      %i(id version_id project_id tracker_id subject start_date due_date).include?(key)
     end
   end
 
@@ -202,6 +202,8 @@ class OrgRedmine
       # TODO: add status_id with proper mapping
       # TODO: add assigned_to_id with proper mapping
 
+      issue[:start_date] = headline.scheduled_at
+      issue[:due_date] = headline.deadline_at
       parent = headline.ancestor_if(&:redmine_issue?)
       issue[:parent_issue] = parent.redmine_issue_id if parent&.redmine_issue_id
       project = headline.ancestor_if(&:redmine_project?)
@@ -231,6 +233,8 @@ class OrgRedmine
       issues.push(*issues_query)
     end
     issues.map do |issue|
+      start_date = issue.try(:start_date) && Date.parse(issue.try(:start_date))
+      due_date = issue.try(:due_date) && Date.parse(issue.try(:due_date))
       {
         id: issue.id,
         project_id: issue.project.id.to_i,
@@ -239,8 +243,8 @@ class OrgRedmine
         subject: issue.subject,
         version_id: issue.try(:fixed_version).andand.id,
         assigned_to_id: issue.try(:assigned_to).id.to_i,
-        start_date: issue.try(:start_date),
-        due_date: issue.try(:due_date),
+        start_date: start_date,
+        due_date: due_date,
         parent_issue: issue.try(:parent)&.id&.to_i
       }
     end
@@ -307,6 +311,8 @@ class OrgRedmine
         RedmineApi::Issue.find(issue[:id])
       redmine_issue.subject = issue[:subject] if issue[:subject]
       redmine_issue.tracker_id = issue[:tracker_id] if issue[:tracker_id]
+      redmine_issue.start_date = issue[:start_date].strftime('%Y-%m-%d') if issue[:start_date]
+      redmine_issue.due_date = issue[:due_date].strftime('%Y-%m-%d') if issue[:due_date]
       redmine_issue.save!
     end
 
