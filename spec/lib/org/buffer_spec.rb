@@ -76,7 +76,7 @@ FILE
   end
 
   describe '#move' do
-    describe 'to earlier position' do
+    describe 'to later position' do
       before(:each) do
         buffer.move(15, 33, 46)
       end
@@ -112,7 +112,7 @@ FILE
         expect(buffer.positions.map(&:value)).to eq([0, 15, 28, 44, 51])
       end
     end
-    describe 'to later position' do
+    describe 'to earlier position' do
       let(:buffer) do
         Org::Buffer.new(<<FILE)
 * First Parent
