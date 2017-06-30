@@ -46,6 +46,7 @@ module Org
 
     def move(pos1, pos2, new_pos)
       pos1, pos2, new_pos = pos1.to_i, pos2.to_i, new_pos.to_i
+      return if pos2 == new_pos
       movable_string = string[pos1...pos2]
       string[pos1...pos2] = ''
       new_pos -= pos2 - pos1 if pos2 < new_pos
