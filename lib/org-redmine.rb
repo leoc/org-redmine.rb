@@ -208,8 +208,7 @@ class OrgRedmine
       issue[:parent_issue] = parent.redmine_issue_id if parent&.redmine_issue_id
       project = headline.ancestor_if(&:redmine_project?)
       issue[:project_id] = @project_ids[project.redmine_project_id] if project&.redmine_project_id
-      version = headline.ancestor_if(&:redmine_version?)
-      issue[:version_id] = version.redmine_version_id.to_i if version&.redmine_version_id
+      issue[:version_id] = headline.redmine_version_id
       issues.push(issue)
       headline = file.find_headline(offset: headline.ending, with: { title: /#(\d+) - .*/ })
     end
