@@ -383,12 +383,10 @@ LINE
     end
   end
 
-  describe '#each_ancestor' do
-    it 'goes through all ancestors'
-  end
+  describe '#append_subheading' do
+    it 'appends a heading to the given heading' do
 
-  describe '#find_ancestor' do
-    it 'finds the filtered ancestor'
+    end
   end
 
   describe '#add_subheading' do
