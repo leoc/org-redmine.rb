@@ -383,9 +383,40 @@ LINE
     end
   end
 
-  describe '#append_subheading' do
+  describe '#append_heading' do
     it 'appends a heading to the given heading' do
+      headlines[3].append_heading(headlines[5])
+      expect(file.buffer.string).to eq(<<FILE)
+* First Parent                                                    :inherited:
+** TODO First Sub
+** NEXT Second Sub
+*** DONE First SubSub                                            :@feature:
+**** TODO Third Sub
+SCHEDULED: <2017-06-14 Wed>
+:PROPERTIES:
+:STYLE: habit
+:END:
+Some description.
+* Second Parent
+Some contents for this heading.
 
+FILE
+      headlines[2].append_heading(headlines[5])
+      expect(file.buffer.string).to eq(<<FILE)
+* First Parent                                                    :inherited:
+** TODO First Sub
+** NEXT Second Sub
+*** DONE First SubSub                                            :@feature:
+*** TODO Third Sub
+SCHEDULED: <2017-06-14 Wed>
+:PROPERTIES:
+:STYLE: habit
+:END:
+Some description.
+* Second Parent
+Some contents for this heading.
+
+FILE
     end
   end
 
