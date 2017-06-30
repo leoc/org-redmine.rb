@@ -261,7 +261,6 @@ class OrgRedmine
     cache_issues = cache.issues.map(&method(:clean_issue))
     local_issues_diff = OrgRedmine::Issue.diff_issues(cache_issues, local_issues.map(&method(:clean_issue)))
     remote_issues_diff = OrgRedmine::Issue.diff_issues(cache_issues, get_remote_issues.map(&method(:clean_issue)))
-    binding.pry
     ap(local_issues_diff: local_issues_diff)
     ap(remote_issues_diff: remote_issues_diff)
 
@@ -294,6 +293,7 @@ class OrgRedmine
         issue_headline.redmine_tracker = @trackers[issue[:tracker_id]].name.downcase if issue[:tracker_id]
         issue_headline.scheduled_at = issue[:start_date] if issue.key?(:start_date)
         issue_headline.deadline_at = issue[:due_date] if issue.key?(:due_date)
+        issue_headline.redmine_version_id = issue[:version_id] if issue.key?(:version_id)
       else
         parent_headline = nil
         parent_headline = file.find_version_headline(issue[:version_id]) if issue[:version_id]
@@ -314,6 +314,7 @@ class OrgRedmine
       redmine_issue.tracker_id = issue[:tracker_id] if issue[:tracker_id]
       redmine_issue.start_date = issue[:start_date].andand.strftime('%Y-%m-%d') if issue.key?(:start_date)
       redmine_issue.due_date = issue[:due_date].andand.strftime('%Y-%m-%d') if issue.key?(:due_date)
+      redmine_issue.fixed_version_id = issue[:version_id] if issue.key?(:version_id)
       redmine_issue.save!
     end
 
