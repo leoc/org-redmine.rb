@@ -391,8 +391,24 @@ LINE
     it 'finds the filtered ancestor'
   end
 
-  describe '#append_subheading' do
-    it 'appends a heading to the given heading'
+  describe '#add_subheading' do
+    it 'appends a new heading to the given heading' do
+      headlines[2].add_subheading(todo: 'NEXT', title: 'First Added Heading')
+      headlines[4].add_subheading(todo: 'TODO', title: 'Second Added Heading')
+      expect(file.buffer.string).to include(<<HEADLINE)
+*** DONE First SubSub                                            :@feature:
+*** NEXT First Added Heading
+HEADLINE
+      expect(file.buffer.string).to include(<<HEADLINE)
+** TODO Third Sub
+SCHEDULED: <2017-06-14 Wed>
+:PROPERTIES:
+:STYLE: habit
+:END:
+Some description.
+** TODO Second Added Heading
+HEADLINE
+    end
   end
 
   describe '#each_child' do

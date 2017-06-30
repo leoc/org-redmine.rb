@@ -7,15 +7,15 @@ module Org
 
     def initialize(file, beginning, ending, options = {})
       super(file, beginning, ending)
-      if beginning == ending
-        options = { level: 1 }.merge(options)
-        todo = options[:todo] ? "#{options[:todo]} " : ''
-        tags = options[:tags] ? "  :#{options[:tags].join(':')}:" : ''
-        file.insert(beginning, "\n")
-        @beginning = beginning + 1
-        @ending = beginning + 1
-        self.string = "#{'*' * options[:level]} #{todo}#{options[:title]}#{tags}"
-      end
+
+      return if beginning != ending
+      options = { level: 1 }.merge(options)
+      todo = options[:todo] ? "#{options[:todo]} " : ''
+      tags = options[:tags] ? "  :#{options[:tags].join(':')}:" : ''
+      file.insert(beginning, "\n")
+      @beginning = beginning + 1
+      @ending = beginning + 1
+      self.string = "#{'*' * options[:level]} #{todo}#{options[:title]}#{tags}"
     end
 
     def ==(other)
@@ -293,12 +293,13 @@ module Org
     def add_subheadline(options = {}, &block)
       headline = Headline.new(
         file,
-        level_ending,
-        level_ending,
+        level_ending.to_i - 1,
+        level_ending.to_i - 1,
         options.merge(level: (level + 1))
       )
       yield(headline) if block_given?
     end
+    alias add_subheading add_subheadline
 
     def move(new_beginning)
       file.buffer.move(beginning, level_ending, new_beginning)
