@@ -6,6 +6,7 @@ gem 'redmine_api', path: './vendor/redmine_api'
 
 # Debugging
 gem 'pry'
+gem 'pry-byebug'
 gem 'awesome_print'
 
 # Command-line output
