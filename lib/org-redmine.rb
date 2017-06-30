@@ -293,6 +293,8 @@ class OrgRedmine
       if issue_headline
         issue_headline.title = "##{issue[:id]} - #{issue[:subject]}" if issue[:subject]
         issue_headline.redmine_tracker = @trackers[issue[:tracker_id]].name.downcase if issue[:tracker_id]
+        issue_headline.scheduled_at = issue[:start_date] if issue.key?(:start_date)
+        issue_headline.deadline_at = issue[:due_date] if issue.key?(:due_date)
       else
         parent_headline = nil
         parent_headline = file.find_version_headline(issue[:version_id]) if issue[:version_id]
@@ -311,8 +313,8 @@ class OrgRedmine
         RedmineApi::Issue.find(issue[:id])
       redmine_issue.subject = issue[:subject] if issue[:subject]
       redmine_issue.tracker_id = issue[:tracker_id] if issue[:tracker_id]
-      redmine_issue.start_date = issue[:start_date].strftime('%Y-%m-%d') if issue[:start_date]
-      redmine_issue.due_date = issue[:due_date].strftime('%Y-%m-%d') if issue[:due_date]
+      redmine_issue.start_date = issue[:start_date].andand.strftime('%Y-%m-%d') if issue.key?(:start_date)
+      redmine_issue.due_date = issue[:due_date].andand.strftime('%Y-%m-%d') if issue.key?(:due_date)
       redmine_issue.save!
     end
 
