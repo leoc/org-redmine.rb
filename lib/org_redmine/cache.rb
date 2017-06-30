@@ -56,7 +56,6 @@ class OrgRedmine
         end
         if existing_element
           diff_obj.each_pair do |key, value|
-            next if value.nil? && existing_element.key?(key)
             existing_element[key] = value
           end
         else
