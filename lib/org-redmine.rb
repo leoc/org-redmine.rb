@@ -48,7 +48,7 @@ class OrgRedmine
 
   def clean_issue(issue)
     issue.select do |key, value|
-      %i(id version_id project_id tracker_id subject start_date due_date).include?(key)
+      %i(id version_id project_id parent_issue tracker_id subject start_date due_date).include?(key)
     end
   end
 
