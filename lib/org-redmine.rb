@@ -103,6 +103,7 @@ class OrgRedmine
         tracker_id: @tracker_ids[extract_tracker(headline.tags)],
         fixed_version_id: version.andand.redmine_version_id,
         subject: headline.sanitized_title,
+        description: headline.contents,
         parent_issue_id: parent&.redmine_issue_id,
         assigned_to_id: @user.id
       )
